@@ -32,32 +32,41 @@ namespace MealPlanner.Model
         public void LoadRecipeFiles(string[] recipeFiles)
         {
             //Implement Me
-            // Console.WriteLine("Loaded recipe strings:");
-            foreach (string s in recipeFiles)
             {
-                // Console.WriteLine(s);
-                using (StreamReader sr = new StreamReader(s))
+                foreach (string s in recipeFiles)
                 {
-                    string[] data = sr.ReadLine().Split(", ");
-                    Dictionary<IIngredient, int>ingredients = new Dictionary<IIngredient, int>();
-                    string line;
-                    // Read and display lines from the file until the end of
-                    // the file is reached.
-                    while ((line = sr.ReadLine()) != null)
+                    using (StreamReader sr = new StreamReader(s))
                     {
-                        string[] ingData = line.Split(", ");
-                        // to complete, maybe
-                        IIngredient ing = pantry.GetIngredient(int.Parse(ingData[0]));
-                        if (ing != null) ingredients.Add(ing, int.Parse(ingData[1]));
+                        string[] data = sr.ReadLine().Split(", ");
+                        Dictionary<IIngredient, int> ingredients = new Dictionary<IIngredient, int>();
+                        string line;
+
+                        while ((line = sr.ReadLine()) != null)
+                        {
+                            string[] ingData = line.Split(", ");
+                            string ingredientId = ingData[0];
+                            int quantity = int.Parse(ingData[1]);
+
+                            IIngredient ing = pantry.GetIngredient(ingredientId);
+                            if (ing != null)
+                            {
+                                if (ingredients.ContainsKey(ing))
+                                    ingredients[ing] += quantity;
+                                else
+                                    ingredients.Add(ing, quantity);
+                            }
+                        }
+
+                        Recipe newRecipe = new Recipe(data[0], double.Parse(data[1]), ingredients);
+                        recipeBook.Add(newRecipe);
                     }
-                    Recipe newRecipe = new Recipe(data[0], double.Parse(data[1]), ingredients);
-                    recipeBook.Add(newRecipe);
                 }
+
+                recipeBook.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.OrdinalIgnoreCase));
             }
+        }
 
-            recipeBook.Sort();
-
-        }   
+                  
 
         /// <summary>
         /// Attempts to cook a meal from a given recipe. Consumes pantry 
