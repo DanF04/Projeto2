@@ -10,14 +10,14 @@ namespace MealPlanner.Model
     {
 
         public string Name { get; }
-        public IReadOnlyDictionary<IIngredient, int> RequiredIngredient { get; }
+        public IReadOnlyDictionary<IIngredient, int> IngredientsNeeded { get; }
         public double SuccessRate { get; }
         
-        public Recipe(string name, double successRate, Dictionary<IIngredient, int> ingredient)
+        public Recipe(string name, double successRate, Dictionary<IIngredient, int> ingredients)
         {
             Name = name;
             SuccessRate = successRate;
-            RequiredIngredients = ingredients;
+            IngredientsNeeded = ingredients;
         }
         
         public int CompareTo(IRecipe obj)

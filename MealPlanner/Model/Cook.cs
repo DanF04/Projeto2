@@ -42,14 +42,16 @@ namespace MealPlanner.Model
                     while ((line = sr.ReadLine()) != null)
                     {
                         string[] ingData = line.Split(", ");
-                    
+
                         IIngredient ing = pantry.GetIngredient(int.Parse(ingData[0]));
                         if (ing != null) ingredients.Add(ing, int.Parse(ingData[1]));
                     }
                     Recipe newRecipe = new Recipe(data[0], double.Parse(data[1]), ingredients);
-                    recipeList.Add(newRecipe);
+                    recipeFiles.Add(newRecipe);
                 }
+            recipeFiles.Sort();
             }
+            
 
         /// <summary>
         /// Attempts to cook a meal from a given recipe. Consumes pantry 
@@ -70,7 +72,7 @@ namespace MealPlanner.Model
                     break;
                 }
             }
-            
+
             if (selected == null)
                 return "Recipe not found.";
 
@@ -83,7 +85,7 @@ namespace MealPlanner.Model
                 {
                     if (have == 0)
                         return "Missing ingredient: " + ingredient.Name;
-         
+
                     return "Not enough " + ingredient.Name +
                            " (need " + need + ", have " + have + ")";
                 }
@@ -103,4 +105,3 @@ namespace MealPlanner.Model
     }
 }
     
-}
