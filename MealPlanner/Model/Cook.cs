@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace MealPlanner.Model
 {
@@ -31,27 +32,32 @@ namespace MealPlanner.Model
         public void LoadRecipeFiles(string[] recipeFiles)
         {
             //Implement Me
+            // Console.WriteLine("Loaded recipe strings:");
             foreach (string s in recipeFiles)
             {
+                // Console.WriteLine(s);
                 using (StreamReader sr = new StreamReader(s))
                 {
                     string[] data = sr.ReadLine().Split(", ");
-                    Dictionary<IIngredient, int> ingredient = new Dictionary<IIngredient, int>();
+                    Dictionary<IIngredient, int>ingredients = new Dictionary<IIngredient, int>();
                     string line;
-
+                    // Read and display lines from the file until the end of
+                    // the file is reached.
                     while ((line = sr.ReadLine()) != null)
                     {
                         string[] ingData = line.Split(", ");
-
+                        // to complete, maybe
                         IIngredient ing = pantry.GetIngredient(int.Parse(ingData[0]));
                         if (ing != null) ingredients.Add(ing, int.Parse(ingData[1]));
                     }
                     Recipe newRecipe = new Recipe(data[0], double.Parse(data[1]), ingredients);
-                    recipeFiles.Add(newRecipe);
+                    recipeBook.Add(newRecipe);
                 }
-            recipeFiles.Sort();
             }
-            
+
+            recipeBook.Sort();
+
+        }   
 
         /// <summary>
         /// Attempts to cook a meal from a given recipe. Consumes pantry 
