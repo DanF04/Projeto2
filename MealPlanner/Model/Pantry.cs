@@ -41,6 +41,8 @@ namespace MealPlanner.Model
         public void AddIngredient(IIngredient ingredient, int quantity)
         {
             //Implement Me
+            if (ingredients.TryAdd(ingredient, quantity)) return;
+            ingredients[ingredient] += quantity;
         }
 
         /// <summary>
@@ -54,6 +56,11 @@ namespace MealPlanner.Model
         public bool ConsumeIngredient(IIngredient ingredient, int quantity)
         {
             //Implement Me
+            if (GetQuantity(ingredient) >= quantity)
+            {
+                ingredients[ingredient] -= quantity;
+                return true;
+            }
             return false;
         }
 
@@ -87,6 +94,16 @@ namespace MealPlanner.Model
         public void LoadIngredientsFile(string file)
         {
             //Implement Me
+             using (StreamReader sr = new StreamReader(file))
+            {
+                string line;
+                while ((line = sr.ReadLine()) != null)
+                {
+                    string[] ingData = line.Split(", ");
+                    ingredients.Add(new Ingredient(int.Parse(ingData[0]), ingData[1]), int.Parse(ingData[2]));
+                }
+            }
+
         }
     }
 }

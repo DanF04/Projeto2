@@ -31,7 +31,25 @@ namespace MealPlanner.Model
         public void LoadRecipeFiles(string[] recipeFiles)
         {
             //Implement Me
-        }
+            foreach (string s in recipeFiles)
+            {
+                using (StreamReader sr = new StreamReader(s))
+                {
+                    string[] data = sr.ReadLine().Split(", ");
+                    Dictionary<IIngredient, int> ingredient = new Dictionary<IIngredient, int>();
+                    string line;
+
+                    while ((line = sr.ReadLine()) != null)
+                    {
+                        string[] ingData = line.Split(", ");
+                    
+                        IIngredient ing = pantry.GetIngredient(int.Parse(ingData[0]));
+                        if (ing != null) ingredients.Add(ing, int.Parse(ingData[1]));
+                    }
+                    Recipe newRecipe = new Recipe(data[0], double.Parse(data[1]), ingredients);
+                    recipeList.Add(newRecipe);
+                }
+            }
 
         /// <summary>
         /// Attempts to cook a meal from a given recipe. Consumes pantry 
@@ -83,4 +101,6 @@ namespace MealPlanner.Model
 
         }
     }
+}
+    
 }
