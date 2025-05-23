@@ -94,17 +94,25 @@ namespace MealPlanner.Model
         /// <param name="file">Path to the ingredients file</param>
         public void LoadIngredientsFile(string file)
         {
-            //Implement Me
-             using (StreamReader sr = new StreamReader(file))
+            using (StreamReader sr = new StreamReader(file))
             {
                 string line;
                 while ((line = sr.ReadLine()) != null)
                 {
                     string[] ingData = line.Split(", ");
-                    ingredients.Add(new Ingredient(int.Parse(ingData[0]), ingData[1]), int.Parse(ingData[2]));
+                    if (ingData.Length < 3) continue;
+
+                    string type = ingData[0];
+                    string name = ingData[1];
+
+                    if (!int.TryParse(ingData[2], out int quantity))
+                        continue;
+
+                    IIngredient ingredient = new Ingredient(type, name);
+                    AddIngredient(ingredient, quantity);
                 }
             }
-
         }
     }
+
 }
