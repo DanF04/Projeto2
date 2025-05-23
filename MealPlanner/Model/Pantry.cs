@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
-
+using System;  
 namespace MealPlanner.Model
 {
     /// <summary>
@@ -99,20 +99,24 @@ namespace MealPlanner.Model
                 string line;
                 while ((line = sr.ReadLine()) != null)
                 {
-                    string[] ingData = line.Split(", ");
-                    if (ingData.Length < 3) continue;
+                    // Split by whitespace, remove empty entries
+                    string[] ingData = line.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
-                    string type = ingData[0];
-                    string name = ingData[1];
+                    if (ingData.Length < 3)
+                        continue;  // skip malformed lines
+
+                    string name = ingData[0];
+                    string type = ingData[1];
 
                     if (!int.TryParse(ingData[2], out int quantity))
-                        continue;
+                        continue; // skip invalid quantity
 
                     IIngredient ingredient = new Ingredient(type, name);
                     AddIngredient(ingredient, quantity);
                 }
             }
         }
+
     }
 
 }

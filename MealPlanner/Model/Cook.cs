@@ -31,40 +31,53 @@ namespace MealPlanner.Model
         /// <param name="recipeFiles">Array of file paths</param>
         public void LoadRecipeFiles(string[] recipeFiles)
         {
-            //Implement Me
+            foreach (string filePath in recipeFiles)
             {
-                foreach (string s in recipeFiles)
+                using (StreamReader sr = new StreamReader(filePath))
                 {
-                    using (StreamReader sr = new StreamReader(s))
+                    // Read and parse the first line: recipe name and success rate
+                    string headerLine = sr.ReadLine();
+                    if (string.IsNullOrWhiteSpace(headerLine))
+                        throw new InvalidDataException($"Recipe file '{filePath}' missing header line.");
+
+                    string[] data = headerLine.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                    if (data.Length < 2)
+                        throw new InvalidDataException($"Recipe header in '{filePath}' must contain name and success rate.");
+
+                    string recipeName = data[0];
+                    if (!double.TryParse(data[1], out double successRate))
+                        throw new InvalidDataException($"Invalid success rate in recipe '{recipeName}' in file '{filePath}'.");
+
+                    Dictionary<IIngredient, int> ingredients = new Dictionary<IIngredient, int>();
+
+                    string line;
+                    while ((line = sr.ReadLine()) != null)
                     {
-                        string[] data = sr.ReadLine().Split(", ");
-                        Dictionary<IIngredient, int> ingredients = new Dictionary<IIngredient, int>();
-                        string line;
+                        if (string.IsNullOrWhiteSpace(line)) continue;
 
-                        while ((line = sr.ReadLine()) != null)
-                        {
-                            string[] ingData = line.Split(", ");
-                            string ingredientId = ingData[0];
-                            int quantity = int.Parse(ingData[1]);
+                        string[] ingData = line.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                        if (ingData.Length < 2)
+                            throw new InvalidDataException($"Malformed ingredient line in '{filePath}': '{line}'");
 
-                            IIngredient ing = pantry.GetIngredient(ingredientId);
-                            if (ing != null)
-                            {
-                                if (ingredients.ContainsKey(ing))
-                                    ingredients[ing] += quantity;
-                                else
-                                    ingredients.Add(ing, quantity);
-                            }
-                        }
+                        string ingredientName = ingData[0];
+                        if (!int.TryParse(ingData[1], out int quantity))
+                            throw new InvalidDataException($"Invalid quantity for ingredient '{ingredientName}' in '{filePath}'.");
 
-                        Recipe newRecipe = new Recipe(data[0], double.Parse(data[1]), ingredients);
-                        recipeBook.Add(newRecipe);
+                        IIngredient ing = pantry.GetIngredient(ingredientName);
+                        if (ing == null)
+                            throw new InvalidDataException($"Ingredient '{ingredientName}' not found in pantry when loading '{filePath}'.");
+
+                        ingredients.Add(ing, quantity);
                     }
-                }
 
-                recipeBook.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.OrdinalIgnoreCase));
+                    Recipe newRecipe = new Recipe(recipeName, successRate, ingredients);
+                    recipeBook.Add(newRecipe);
+                }
             }
+
+            recipeBook.Sort();
         }
+
 
                   
 
